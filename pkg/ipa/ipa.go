@@ -2,6 +2,7 @@ package ipa
 
 import (
 	"archive/zip"
+	"bytes"
 	"errors"
 	"image"
 	"image/png"
@@ -11,8 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/iineva/CgbiPngFix/ipaPng"
-
+	"github.com/andrianbdn/iospng"
 	"github.com/iineva/bom/pkg/asset"
 	"github.com/iineva/ipa-server/pkg/plist"
 	"github.com/iineva/ipa-server/pkg/seekbuf"
@@ -133,6 +133,7 @@ func Parse(readerAt io.ReaderAt, size int64) (*IPA, error) {
 		if size > maxSize {
 			maxSize = size
 			iconFile = f
+			break
 		}
 	}
 	// parse icon
@@ -178,30 +179,25 @@ func iconSize(fileName string) (s int, err error) {
 func parseIconImage(iconFile *zip.File) (image.Image, error) {
 
 	if iconFile == nil {
-		return nil, errors.New("icon file is nil")
+		return nil, errors.New("icon not found")
 	}
 
-	f, err := iconFile.Open()
+	rc, err := iconFile.Open()
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
-	buf, err := seekbuf.Open(f, seekbuf.MemoryMode)
+	defer rc.Close()
+
+	var w bytes.Buffer
+	err = iospng.PngRevertOptimization(rc, &w)
 	if err != nil {
 		return nil, err
 	}
-	defer buf.Close()
 
-	img, err := png.Decode(buf)
-	if err != nil {
-		// try fix to std png
-		cgbi, err := ipaPng.Decode(buf)
-		if err != nil {
-			return nil, err
-		}
-		img = cgbi.Img
+	img, err1 := png.Decode(io.MultiReader(&w, rc))
+	if err1 != nil {
+		return nil, err1
 	}
-
 	return img, nil
 }
 

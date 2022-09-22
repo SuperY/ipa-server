@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.1.8+incompatible
+	github.com/andrianbdn/iospng v0.0.0-20180730113000-dccef1992541 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.6.0
 	github.com/aws/aws-sdk-go-v2/config v1.3.0
 	github.com/aws/aws-sdk-go-v2/credentials v1.2.1
