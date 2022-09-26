@@ -1,7 +1,7 @@
-version: "3"
+version: "2"
 services:
   web:
-    image: hub.tri-jp.work/app/app-download:latest
+    build: .
     container_name: ipa-server
     restart: unless-stopped
     environment:

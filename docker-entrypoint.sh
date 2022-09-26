@@ -27,4 +27,5 @@ if [ -n "$META_PATH" ];then
     ipasd_args=$ipasd_args"-meta-path $META_PATH "
 fi
 
+echo "/app/ipasd $ipasd_args"
 /app/ipasd $ipasd_args
